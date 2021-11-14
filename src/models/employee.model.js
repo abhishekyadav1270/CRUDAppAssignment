@@ -1,18 +1,14 @@
 'user strict';
 var dbConn = require('./../../config/db.config');
 
+
 //Employee object create
 var Employee = function(employee){
-    this.first_name     = employee.first_name;
-    this.last_name      = employee.last_name;
-    this.email          = employee.email;
-    this.phone          = employee.phone;
-    this.organization   = employee.organization;
-    this.designation    = employee.designation;
-    this.salary         = employee.salary;
-    this.status         = employee.status ? employee.status : 1;
-    this.created_at     = new Date();
-    this.updated_at     = new Date();
+    this.id=employee.id;
+    this.employee_name=employee.employee_name;
+    this.employee_salary=employee.employee_salary;
+    this.employee_age=employee.employee_age;
+    this.profile_image=employee.profile_image;
 };
 Employee.create = function (newEmp, result) {    
     dbConn.query("INSERT INTO employees set ?", newEmp, function (err, res) {
@@ -37,8 +33,11 @@ Employee.findById = function (id, result) {
         }
     });   
 };
-Employee.findAll = function (result) {
-    dbConn.query("Select * from employees", function (err, res) {
+Employee.findAll = function (req,result) {
+    console.log(JSON.stringify(result));
+    var skip=req.body.skip;
+    var limit=req.body.limit;
+    dbConn.query(`Select * from employees LIMIT ${skip},${limit}`, function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);
@@ -50,7 +49,7 @@ Employee.findAll = function (result) {
     });   
 };
 Employee.update = function(id, employee, result){
-  dbConn.query("UPDATE employees SET first_name=?,last_name=?,email=?,phone=?,organization=?,designation=?,salary=? WHERE id = ?", [employee.first_name,employee.last_name,employee.email,employee.phone,employee.organization,employee.designation,employee.salary, id], function (err, res) {
+  dbConn.query("UPDATE employees SET employee_name=?,employee_salary=?,employee_age=?,profile_image=? WHERE id = ?", [employee.employee_name,employee.employee_salary,employee.employee_age,employee.profile_image, id], function (err, res) {
         if(err) {
             console.log("error: ", err);
             result(null, err);

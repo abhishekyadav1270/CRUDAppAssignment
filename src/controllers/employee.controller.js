@@ -1,9 +1,11 @@
 'use strict';
 
 const Employee = require('../models/employee.model');
+var dbConn = require('./../../config/db.config');
+var rp = require('request-promise');
 
 exports.findAll = function(req, res) {
-  Employee.findAll(function(err, employee) {
+  Employee.findAll(req,function(err, employee) {
     console.log('controller')
     if (err)
     res.send(err);
@@ -28,6 +30,37 @@ exports.create = function(req, res) {
     }
 };
 
+exports.createAPIData=async function(req, res) {
+   //const new_employee = new Employee(req.body);
+
+    var options = {
+        uri: 'http://dummy.restapiexample.com/api/v1/employees',
+        headers: {
+            'User-Agent': 'Request-Promise'
+        },
+        json: true 
+    };
+     
+    await rp(options)
+        .then(function (repos) {
+            repos.data.forEach(element => {
+                dbConn.query("INSERT INTO employees set ?", element);      
+
+            });
+            return res.json({
+                "error":false,
+                "data":"All dummy data insereteed successfully"
+            })
+        })
+        .catch(function (err) {
+           console.log(err);
+           return res.json({
+               "error":true,
+               "data":err
+           })
+        });
+    
+};
 
 exports.findById = function(req, res) {
     Employee.findById(req.params.id, function(err, employee) {
